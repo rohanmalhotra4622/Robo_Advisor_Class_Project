@@ -14,9 +14,10 @@ def to_usd(my_price):
 
 
 # INFO Inputs
+
 api_key = os.environ.get("ALPHAVANTAGE_API_KEY")
-#print(api_key)
-symbol = "MSFT"
+symbol = input("please enter symbol: ")
+#symbol = "MSFT"
 request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}"
 ## https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo&datatype=csv
 response = requests.get(request_url)
