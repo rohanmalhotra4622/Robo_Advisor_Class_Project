@@ -5,13 +5,14 @@ import json
 import csv
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 
 def to_usd(my_price):
     return "${0:.2f}".format(my_price)
 
-
+now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
 
 # INFO Inputs
 
@@ -101,7 +102,7 @@ print("-------------------------")
 print("SELECTED SYMBOL: " + symbol.upper())
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
-print("REQUEST AT: 2018-02-20 02:00pm")
+print("REQUEST AT: " + now)
 print("-------------------------")
 print(f"LATEST DAY: {last_refreshed}")
 print(f"LATEST CLOSE: {to_usd(float(latest_close))}")
@@ -122,11 +123,11 @@ print(f"Average price last 30 days: {to_usd(float(avg_30_days))}")
 
 if avg_30_days > float(latest_close):
     recommedation = 'BUY!'
-    reason =  symbol.upper() + ' stock' + ' is undervalued because the 30 day average price of ' + to_usd(float(avg_30_days)) +' is greater than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by'
+    reason =  symbol.upper() + ' stock' + ' is undervalued because the 30 day average price of ' + to_usd(float(avg_30_days)) +' is greater than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_30_days))/float(avg_30_days) * 100 , 2)) + '%'
     
 elif avg_30_days < float(latest_close):
     recommedation = 'SELL!'
-    reason =  symbol.upper() + ' stock' + ' is overvalued because the 30 day average price of ' +  to_usd(float(avg_30_days))+' is less than ' + ' the current price of ' + to_usd(float(latest_close))
+    reason =  symbol.upper() + ' stock' + ' is overvalued because the 30 day average price of ' +  to_usd(float(avg_30_days))+' is less than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_30_days))/float(avg_30_days) * 100 , 2)) + '%'
 else:
     recommedation = 'HOLD!'
     reason =   symbol.upper() + ' stock' + ' is at intrinsic value because the 30 day average price of ' +  to_usd(float(avg_30_days))+ ' is equal to ' + ' the current price of ' + to_usd(float(latest_close))
@@ -134,7 +135,8 @@ print("-------------------------")
 print("RECOMMENDATION: " + recommedation)
 print("RECOMMENDATION REASON: " + reason)
 
-breakpoint()
+#breakpoint()
+print("-------------------------")
 print(f"WRITING DATA TO CSV: {csv_file_path}...")
 print("-------------------------")
 print("HAPPY INVESTING!")
