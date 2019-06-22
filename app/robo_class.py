@@ -19,6 +19,14 @@ now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
 api_key = os.environ.get("ALPHAVANTAGE_API_KEY")
 symbol = input("Please enter symbol: ")
 days  = input("Please enter number of days to calculate arithmetic average: ")
+
+if int(days) > 100 or int(days) < 0:
+    days  = input("Invalid entry: Please renter number of days in range 0-100:  ")
+
+
+
+
+
 request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}"
 ## https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo&datatype=csv
 response = requests.get(request_url)
@@ -100,17 +108,21 @@ for i in range(0,int(days)):
     price =   tsd[dates[i]]['4. close']
     total = total + float(price)
     avg_number_days = total/len(range(0,int(days)))
-    print(price, total)
+    #print(price, total)
 print('Average price last ' + str(int(days)) + ' days: ' + to_usd(float(avg_number_days)))
 
 
 if avg_number_days > float(latest_close):
     recommedation = 'BUY!'
-    reason =  symbol.upper() + ' stock' + ' is undervalued because the ' + str(int(days)) +' day average price of ' + to_usd(float(avg_number_days)) +' is greater than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
+    #reason =  symbol.upper() + ' stock' + ' is undervalued because the ' + str(int(days)) +' day average price of ' + to_usd(float(avg_number_days)) +' is greater than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
+    reason =  symbol.upper() + ' stock' + ' is undervalued because the current price of ' + to_usd(float(latest_close)) + ' is less than the ' +  str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
+
+
     
 elif avg_number_days < float(latest_close):
     recommedation = 'SELL!'
-    reason =  symbol.upper() + ' stock' + ' is overvalued because the ' + str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days))+' is less than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
+    #reason =  symbol.upper() + ' stock' + ' is overvalued because the ' + str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days))+' is less than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
+    reason =  symbol.upper() + ' stock' + ' is overvalued because the current price of ' + to_usd(float(latest_close)) + ' is greater than the ' +  str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
 else:
     recommedation = 'HOLD!'
     reason =   symbol.upper() + ' stock' + ' is at intrinsic value because the ' + str(int(days)) +  ' day average price of ' +  to_usd(float(avg_number_days))+ ' is equal to ' + ' the current price of ' + to_usd(float(latest_close))
@@ -124,3 +136,5 @@ print(f"WRITING DATA TO CSV: {csv_file_path}...")
 print("-------------------------")
 print("HAPPY INVESTING!")
 print("-------------------------")
+
+
