@@ -29,12 +29,26 @@ response = requests.get(request_url)
 parsed_response = json.loads(response.text)
 last_refreshed = parsed_response['Meta Data']['3. Last Refreshed']
 
-#breakpoint()
+
+
 tsd = parsed_response['Time Series (Daily)']
 dates = list(tsd.keys())  # assumes first day is on top;sort to ensure latest day is first
-latest_day = dates[0]
+latest_day = dates[0]  # dates is a list comprised of dates
 latest_close = tsd[latest_day]['4. close']
 
+######''''''
+#total = 0
+#for i in range(0,3):
+#    price =   tsd[dates[i]]['4. close']
+#    total = total + float(price)
+#    print(price , total)
+
+#print(tsd[dates[1]]['4. close'])
+
+
+######''''''
+
+#breakpoint()
 # get high prices from each day
 #high_prices =[]
 #recent_high = max(high_prices)
@@ -84,7 +98,7 @@ with open(csv_file_path, "w") as csv_file: # "w" means "open the file for writin
 
 
 print("-------------------------")
-print("SELECTED SYMBOL: XYZ")
+print("SELECTED SYMBOL: " + symbol.upper())
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
 print("REQUEST AT: 2018-02-20 02:00pm")
@@ -94,13 +108,35 @@ print(f"LATEST CLOSE: {to_usd(float(latest_close))}")
 print(f"RECENT HIGH: {to_usd(float(recent_high))}")
 print(f"RECENT LOW: {to_usd(float(recent_low))}")
 print("-------------------------")
-print("RECOMMENDATION: BUY!")
-print("RECOMMENDATION REASON: TODO")
+
+lc = to_usd(float(latest_close))
+
+## Stock Reccomendation
+total = 0
+for i in range(0,30):
+    price =   tsd[dates[i]]['4. close']
+    total = total + float(price)
+    avg_30_days = total/len(range(0,30))
+    #print(f"Average price last 30 days: {to_usd(float(price))}" , f"Average price last 30 days: {to_usd(float(total))}" , sep = ' | ')
+print(f"Average price last 30 days: {to_usd(float(avg_30_days))}")
+
+if avg_30_days > float(latest_close):
+    recommedation = 'BUY!'
+    reason =  symbol.upper() + ' stock' + ' is undervalued because the 30 day average price of ' + to_usd(float(avg_30_days)) +' is greater than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by'
+    
+elif avg_30_days < float(latest_close):
+    recommedation = 'SELL!'
+    reason =  symbol.upper() + ' stock' + ' is overvalued because the 30 day average price of ' +  to_usd(float(avg_30_days))+' is less than ' + ' the current price of ' + to_usd(float(latest_close))
+else:
+    recommedation = 'HOLD!'
+    reason =   symbol.upper() + ' stock' + ' is at intrinsic value because the 30 day average price of ' +  to_usd(float(avg_30_days))+ ' is equal to ' + ' the current price of ' + to_usd(float(latest_close))
 print("-------------------------")
+print("RECOMMENDATION: " + recommedation)
+print("RECOMMENDATION REASON: " + reason)
+
+breakpoint()
 print(f"WRITING DATA TO CSV: {csv_file_path}...")
 print("-------------------------")
 print("HAPPY INVESTING!")
 print("-------------------------")
-
-
-
+#+ ((to_usd(float(latest_close)) - to_usd(float(avg_30_days)))/to_usd(float(avg_30_days))) * 100 + ' %'
