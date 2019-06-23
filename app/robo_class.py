@@ -13,13 +13,15 @@ load_dotenv()
 def to_usd(my_price):
     return "${0:.2f}".format(my_price)
 
+# Create timestamp
+
 now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
 
 # INFO Inputs
 
 api_key = os.environ.get("ALPHAVANTAGE_API_KEY")
 
-
+## Create conditions for system to exit if symbol or number of days seem invalid
 symbol = input("Please enter symbol: ")
 try:
     if isinstance(int(symbol) , int):
@@ -30,10 +32,6 @@ except ValueError:
 
 days  = input("Please enter number of days to calculate arithmetic average: ")
 
-
-#if int(days) > 100 or int(days) < 0:
-    #days  = input("Invalid entry: Please renter number of days in range 1-100:  ")
-
 while True:
     try:
         if int(days) in range(1,101):
@@ -42,8 +40,6 @@ while True:
             days = input("Invalid entry: Please renter number of days in range 1-100:  ")
     except ValueError:
         print("Invalid entry: Please renter number of days in range 1-100:  ")
-
-#breakpoint()
 
 
 request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}"
@@ -57,14 +53,10 @@ response = requests.get(request_url)
 parsed_response = json.loads(response.text)
 last_refreshed = parsed_response['Meta Data']['3. Last Refreshed']
 
-
-
 tsd = parsed_response['Time Series (Daily)']
 dates = list(tsd.keys())  # assumes first day is on top;sort to ensure latest day is first
 latest_day = dates[0]  # dates is a list comprised of dates
 latest_close = tsd[latest_day]['4. close']
-
-
 
 
 # get high and low prices from each day
@@ -81,10 +73,8 @@ for date in dates:
 # take maximum value  
 recent_high = max(high_prices)
 recent_low = min(low_prices)
-#quit()
 
 # INFO Output
-
 
 #csv_file_path = 'data/prices.csv'
 csv_file_path = os.path.join(os.path.dirname(__file__), "..", "data", "prices.csv")
@@ -119,28 +109,23 @@ print(f"RECENT HIGH: {to_usd(float(recent_high))}")
 print(f"RECENT LOW: {to_usd(float(recent_low))}")
 print("-------------------------")
 
-lc = to_usd(float(latest_close))
 
-## Stock Reccomendation
+## Stock Recommendation
+print('These are the prices and cumulative prices for the number of days requested.')
 total = 0
 for i in range(0,int(days)):
     price =   tsd[dates[i]]['4. close']
     total = total + float(price)
     avg_number_days = total/len(range(0,int(days)))
-    #print(price, total)
+    print(to_usd(float(price)) , to_usd(float(total)) , sep = '  |  ')
 print('Average price last ' + str(int(days)) + ' days: ' + to_usd(float(avg_number_days)))
 
 
 if avg_number_days > float(latest_close):
     recommedation = 'BUY!'
-    #reason =  symbol.upper() + ' stock' + ' is undervalued because the ' + str(int(days)) +' day average price of ' + to_usd(float(avg_number_days)) +' is greater than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
     reason =  symbol.upper() + ' stock' + ' is undervalued because the current price of ' + to_usd(float(latest_close)) + ' is less than the ' +  str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
-
-
-    
 elif avg_number_days < float(latest_close):
     recommedation = 'SELL!'
-    #reason =  symbol.upper() + ' stock' + ' is overvalued because the ' + str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days))+' is less than ' + ' the current price of ' + to_usd(float(latest_close)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
     reason =  symbol.upper() + ' stock' + ' is overvalued because the current price of ' + to_usd(float(latest_close)) + ' is greater than the ' +  str(int(days)) + ' day average price of ' +  to_usd(float(avg_number_days)) + ' by ' + str(round((float(latest_close) - float(avg_number_days))/float(avg_number_days) * 100 , 2)) + '%'
 else:
     recommedation = 'HOLD!'
@@ -156,23 +141,3 @@ print("-------------------------")
 print("HAPPY INVESTING!")
 print("-------------------------")
 
-
-#while True:
-#    try:
-#        selected_id = input('Please enter a product identifier: ')
-#        if selected_id == 'DONE' or selected_id == 'done':
-#            break
-#        elif int(selected_id) not in range(0, len(products) + 1):
-#            print('Selected ID not in list; please renter!')
-#        elif products[int(selected_id) -1]['price_per_pound'] == 'Y':
-#            weight = input('Please enter weight in pounds:')
-#            price = products[int(selected_id) -1]['price'] * float(weight)
-#            total_price = total_price + price
-#            selected_ids.append(selected_id)
-#        elif products[int(selected_id) -1]['price_per_pound'] == 'N':
-#            #weight = input('Please enter weight in pounds:')
-#            price = products[int(selected_id) -1]['price']
-#            total_price = total_price + price
-#            selected_ids.append(selected_id)
-#    except ValueError:
-#        print('Invalid entry; please try again!')
