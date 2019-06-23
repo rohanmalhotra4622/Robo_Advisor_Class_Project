@@ -111,7 +111,7 @@ print("-------------------------")
 
 
 ## Stock Recommendation
-print('These are the prices and cumulative prices for the number of days requested.')
+print('These are the prices and cumulative prices for the last ' + str(int(days)) + ' days requested.' )
 total = 0
 for i in range(0,int(days)):
     price =   tsd[dates[i]]['4. close']
