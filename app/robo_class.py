@@ -6,6 +6,7 @@ import csv
 import os
 from dotenv import load_dotenv
 import datetime
+import sys
 
 load_dotenv()
 
@@ -17,14 +18,32 @@ now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %p")
 # INFO Inputs
 
 api_key = os.environ.get("ALPHAVANTAGE_API_KEY")
+
+
 symbol = input("Please enter symbol: ")
+try:
+    if isinstance(int(symbol) , int):
+        sys.exit()
+except ValueError:
+    print('Symbol seems valid')
+
+
 days  = input("Please enter number of days to calculate arithmetic average: ")
 
-if int(days) > 100 or int(days) < 0:
-    days  = input("Invalid entry: Please renter number of days in range 0-100:  ")
 
+#if int(days) > 100 or int(days) < 0:
+    #days  = input("Invalid entry: Please renter number of days in range 1-100:  ")
 
+while True:
+    try:
+        if int(days) in range(1,101):
+            break
+        else:
+            days = input("Invalid entry: Please renter number of days in range 1-100:  ")
+    except ValueError:
+        print("Invalid entry: Please renter number of days in range 1-100:  ")
 
+#breakpoint()
 
 
 request_url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}"
@@ -138,3 +157,22 @@ print("HAPPY INVESTING!")
 print("-------------------------")
 
 
+#while True:
+#    try:
+#        selected_id = input('Please enter a product identifier: ')
+#        if selected_id == 'DONE' or selected_id == 'done':
+#            break
+#        elif int(selected_id) not in range(0, len(products) + 1):
+#            print('Selected ID not in list; please renter!')
+#        elif products[int(selected_id) -1]['price_per_pound'] == 'Y':
+#            weight = input('Please enter weight in pounds:')
+#            price = products[int(selected_id) -1]['price'] * float(weight)
+#            total_price = total_price + price
+#            selected_ids.append(selected_id)
+#        elif products[int(selected_id) -1]['price_per_pound'] == 'N':
+#            #weight = input('Please enter weight in pounds:')
+#            price = products[int(selected_id) -1]['price']
+#            total_price = total_price + price
+#            selected_ids.append(selected_id)
+#    except ValueError:
+#        print('Invalid entry; please try again!')
